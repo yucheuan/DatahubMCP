@@ -7,7 +7,7 @@
 
 ## What It Does
 
-Connects Claude Desktop to:
+Connects LLM Desktop App to:
 - **MySQL Database**: Enterprise database (Attendance, lesson plans, DRDP assessments, etc)
 - **Google Workspace**: Sheets, Forms, Drive integration
 - **Built-in Templates**: Data analysis and report generation prompts
@@ -69,7 +69,7 @@ models.py          # SQLAlchemy ORM models
 
 ## Example Usage
 
-Via Claude Desktop natural language:
+Via Claude Desktop App natural language:
 
 ```
 "Show attendance for site S001 last week"
