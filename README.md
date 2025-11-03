@@ -88,4 +88,5 @@ Via Claude Desktop App natural language:
 
 ---
 
-**Built for**: Education program management
+**Built for**: Education program management  
+**Contact**: YC Huang ([@yucheuan](https://github.com/yucheuan))
