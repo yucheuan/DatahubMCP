@@ -1,18 +1,13 @@
-# DatahubMCP - Data Management MCP Server
-
-> A unified MCP (Model Context Protocol) server that provides seamless access to MySQL databases and Google Workspace APIs through Claude Desktop.
-
-[![Python 3.13+](https://img.shields.io/badge/python-3.13+-blue.svg)](https://www.python.org/downloads/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-
 # DatahubMCP - Education Data Integration Server
 
 > MCP server enabling Claude to query MySQL databases and Google Workspace for education program management.
+[![Python 3.13+](https://img.shields.io/badge/python-3.13+-blue.svg)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## What It Does
 
 Connects Claude Desktop to:
-- **MySQL Database**: Attendance, lesson plans, DRDP assessments, support reports
+- **MySQL Database**: Enterprise database (Attendance, lesson plans, DRDP assessments, etc)
 - **Google Workspace**: Sheets, Forms, Drive integration
 - **Built-in Templates**: Data analysis and report generation prompts
 
@@ -38,7 +33,7 @@ cp .env.example .env
   "mcpServers": {
     "datahub": {
       "command": "uv",
-      "args": ["--directory", "/path/to/DatahubMCP", "run", "kmmcp.py"]
+      "args": ["--directory", "/path/to/DatahubMCP", "run", "datahubmcp.py"]
     }
   }
 }
@@ -52,7 +47,7 @@ cp .env.example .env
 - Hierarchical site/classroom listing
 
 **Google Workspace Tools**
-- List/read spreadsheets, create forms
+- List/read/write spreadsheets, create forms
 - Sheet data as MCP resources
 - OAuth authentication flow
 
@@ -64,7 +59,7 @@ cp .env.example .env
 ## Project Structure
 
 ```
-kmmcp.py           # FastMCP server with tool definitions
+datahubmcp.py      # FastMCP server with tool definitions
 database.py        # MySQL session management
 google_service.py  # Google OAuth & API builders
 models.py          # SQLAlchemy ORM models
@@ -90,23 +85,6 @@ Via Claude Desktop natural language:
 - **Error Handling**: Comprehensive validation and user-friendly messages
 - **Separation of Concerns**: Modular architecture (DB/API/MCP layers)
 
-## Documentation
-
-- `SETUP.md` - Step-by-step installation guide
-- `HOW_TO_CONFIGURE.md` - Environment configuration reference
-- `README.md` - Full documentation (this file)
-
-## Skills Demonstrated
-
-✅ API Integration (Google OAuth, MySQL)  
-✅ Database ORM with SQLAlchemy  
-✅ MCP Protocol Implementation  
-✅ Environment-based Configuration  
-✅ Clean Architecture & Separation of Concerns  
-✅ Type-safe Python Development  
-
 ---
 
-**Built for**: Kai Ming Head Start education program management  
-**License**: MIT  
-**Contact**: yucheng.contact@gmail.com
+**Built for**: Education program management

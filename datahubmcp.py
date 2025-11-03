@@ -6,13 +6,7 @@ from google_service import get_sheets_service, get_forms_service, get_drive_serv
 from datetime import datetime, timedelta
 import json
 
-# Initialize FastMCP server
 mcp = FastMCP()
-
-
-# ============================================================================
-# DRDP MAPPING HELPER FUNCTION
-# ============================================================================
 
 def convert_drdp_value_to_level(value: Optional[float]) -> Optional[str]:
     """Convert numeric DRDP value to text description.
@@ -71,19 +65,18 @@ def convert_drdp_value_to_level(value: Optional[float]) -> Optional[str]:
         return base_description
 
 
-# Add tools
 @mcp.tool()
 def get_sites_with_classrooms(site_name: Optional[str] = None) -> List[Dict[str, Any]]:
     """Get all sites with their classrooms in a hierarchical structure.
     
     Args:
-        site_name: Optional filter by site name (partial match supported)
+        site_name: Optional filter by site name (partial match)
     
     Returns:
         List of sites, each containing their classroom information
     """
     with get_db_session() as db:
-        # Query sites
+        
         sites_query = db.query(AgencySites)
         if site_name:
             sites_query = sites_query.filter(AgencySites.Site_Name.like(f"%{site_name}%"))
@@ -106,7 +99,6 @@ def get_sites_with_classrooms(site_name: Optional[str] = None) -> List[Dict[str,
                     {
                         "room_id": room.Room_ID,
                         "room_name": room.Room_Name,
-                        # "room_age_group": room.Room_AgeGroup
                     }
                     for room in classrooms
                 ]
@@ -202,11 +194,7 @@ def query_attendance_logs(
         
         # Order by date descending (most recent first)
         query = query.order_by(DailyAttendanceLog.Form_Date.desc())
-        
-        # Apply limit
         query = query.limit(limit)
-        
-        # Execute query and convert to dictionaries
         results = query.all()
         
         return {
@@ -325,7 +313,7 @@ def query_center_support_reports(
             query = query.filter(CenterSupportReport.User_ID == user_id)
         
         if staff_name:
-            # Search for staff name within User_ID (e.g., "john" matches "john.doe@domain.org")
+            # Search for staff name within User_ID
             query = query.filter(CenterSupportReport.User_ID.like(f"%{staff_name}%"))
         
         # Apply date range filter on Form_Date
@@ -394,16 +382,14 @@ def get_drdp_measures_for_lesson_plan(db, form_id: str) -> List[Dict[str, Any]]:
         p_no = detail.P_No
         p_content = detail.P_Content
         
-        # Parse P_Content as comma-separated values
         if p_content:
-            # Split by comma and strip whitespace
             uuid_items = [item.strip() for item in p_content.split(',') if item.strip()]
         else:
             uuid_items = []
         
         # Query DRDPItems for each UUID_Item
         for uuid_item in uuid_items:
-            if uuid_item:  # Skip empty strings
+            if uuid_item: 
                 drdp_item = db.query(DRDPItems).filter(
                     DRDPItems.UUID_Item == uuid_item
                 ).first()
@@ -413,7 +399,7 @@ def get_drdp_measures_for_lesson_plan(db, form_id: str) -> List[Dict[str, Any]]:
                         "p_no": p_no,
                         "uuid_item": uuid_item,
                         "item_name": drdp_item.Item_Name,
-                        "item_category": drdp_item.Item_Catagory  # Note: Database column is misspelled as "Catagory"
+                        "item_category": drdp_item.Item_Catagory 
                     })
     
     return drdp_measures
@@ -749,10 +735,6 @@ def query_drdp_records(
         }
 
 
-# ============================================================================
-# GOOGLE SHEETS TOOLS
-# ============================================================================
-
 @mcp.tool()
 def list_spreadsheets(max_results: int = 20) -> str:
     """
@@ -803,56 +785,56 @@ def read_sheet(spreadsheet_id: str, range_name: str = "Sheet1") -> str:
     return json.dumps(values, indent=2)
 
 
-# @mcp.tool()
-# def write_sheet(spreadsheet_id: str, range_name: str, values: list) -> str:
-#     """
-#     Write data to a Google Sheet
+@mcp.tool()
+def write_sheet(spreadsheet_id: str, range_name: str, values: list) -> str:
+    """
+    Write data to a Google Sheet
     
-#     Args:
-#         spreadsheet_id: The ID of the spreadsheet
-#         range_name: The A1 notation of where to write
-#         values: 2D list of values to write
+    Args:
+        spreadsheet_id: The ID of the spreadsheet
+        range_name: The A1 notation of where to write
+        values: 2D list of values to write
     
-#     Returns:
-#         Confirmation message
-#     """
-#     service = get_sheets_service()
-#     body = {'values': values}
+    Returns:
+        Confirmation message
+    """
+    service = get_sheets_service()
+    body = {'values': values}
     
-#     result = service.spreadsheets().values().update(
-#         spreadsheetId=spreadsheet_id,
-#         range=range_name,
-#         valueInputOption='RAW',
-#         body=body
-#     ).execute()
+    result = service.spreadsheets().values().update(
+        spreadsheetId=spreadsheet_id,
+        range=range_name,
+        valueInputOption='RAW',
+        body=body
+    ).execute()
     
-#     return f"Updated {result.get('updatedCells')} cells"
+    return f"Updated {result.get('updatedCells')} cells"
 
 
-# @mcp.tool()
-# def append_sheet(spreadsheet_id: str, range_name: str, values: list) -> str:
-#     """
-#     Append data to a Google Sheet
+@mcp.tool()
+def append_sheet(spreadsheet_id: str, range_name: str, values: list) -> str:
+    """
+    Append data to a Google Sheet
     
-#     Args:
-#         spreadsheet_id: The ID of the spreadsheet
-#         range_name: The A1 notation of the range
-#         values: 2D list of values to append
+    Args:
+        spreadsheet_id: The ID of the spreadsheet
+        range_name: The A1 notation of the range
+        values: 2D list of values to append
     
-#     Returns:
-#         Confirmation message
-#     """
-#     service = get_sheets_service()
-#     body = {'values': values}
+    Returns:
+        Confirmation message
+    """
+    service = get_sheets_service()
+    body = {'values': values}
     
-#     result = service.spreadsheets().values().append(
-#         spreadsheetId=spreadsheet_id,
-#         range=range_name,
-#         valueInputOption='RAW',
-#         body=body
-#     ).execute()
+    result = service.spreadsheets().values().append(
+        spreadsheetId=spreadsheet_id,
+        range=range_name,
+        valueInputOption='RAW',
+        body=body
+    ).execute()
     
-#     return f"Appended {result.get('updates').get('updatedCells')} cells"
+    return f"Appended {result.get('updates').get('updatedCells')} cells"
 
 
 @mcp.tool()
@@ -911,9 +893,6 @@ def create_form(title: str, description: str = "") -> str:
         'url': result.get('responderUri')
     }, indent=2)
 
-# ============================================================================
-# GOOGLE SHEETS RESOURCES
-# ============================================================================
 
 @mcp.resource("sheet://{spreadsheet_id}/{range_name}")
 def get_sheet_resource(spreadsheet_id: str, range_name: str = "Sheet1") -> str:
@@ -942,10 +921,6 @@ def get_sheet_resource(spreadsheet_id: str, range_name: str = "Sheet1") -> str:
     
     return '\n'.join(output)
 
-
-# ============================================================================
-# PROMPT TEMPLATES
-# ============================================================================
 
 @mcp.prompt()
 def analyze_sheet_data():
@@ -1080,5 +1055,4 @@ Please provide all URLs and IDs clearly formatted for easy access."""
 
 
 if __name__ == "__main__":
-    # Initialize and run the server
     mcp.run(transport='stdio')
